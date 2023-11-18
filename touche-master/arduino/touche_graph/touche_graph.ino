@@ -3,6 +3,8 @@
 void setup ()
 {
   pinMode (9, OUTPUT); 
+  pinMode(5, OUTPUT);
+  digitalWrite(5,LOW);
   TCCR1A = 0;
   TCCR1B = 0;
   TCCR1A |= (1 << COM1A0);   // Toggle OC1A on Compare Match.
@@ -20,5 +22,10 @@ void loop () {
     Serial.print(" "); 
     Serial.println(analogRead(0), DEC);
     delay(50);
+    if(analogRead(0)>0){
+      digitalWrite(5,HIGH);
+    }else{
+      digitalWrite(5,LOW);
+    }
   }
 }
