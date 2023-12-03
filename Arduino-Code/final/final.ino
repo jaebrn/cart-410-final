@@ -20,9 +20,9 @@ long measurementBHigh = 0; //calibrated max
 
 //Sliding brightness LEDs, PWM duty cycles
 #define slide1 3 //cluster 1
-int duty1 =0;
+int duty1 = 0;
 #define slide2 6 //cluster 2
-int duty2 =0;
+int duty2 = 0;
 
 //Static brightness BLINKING LEDs
 int blinks[] = {5,8,10,11,12,13}; //Pins
@@ -32,46 +32,87 @@ long blinkIntervals[] = {0,0,0,0,0,0}; //Cluster blink intervals
 
 //Timer variables used to determine blink behaviour
 unsigned long previousMillis[] = {0,0,0,0,0,0}; 
-unsigned long currentMillis;
+unsigned long currentMillis = 0;
 
 //SETUP: RUNS ONCE
 void setup() {
    Serial.begin(57600);
 
-  //sliding LED pin modes
-  pinMode(slide1, OUTPUT);
-  pinMode(slide2, OUTPUT);
+   //sliding LED pin modes
+   pinMode(slide1, OUTPUT);
+   pinMode(slide2, OUTPUT);
 
   //blinking LED pin modes
-  for(int i=1; i< blinkClusters+1; i++){
-    pinMode(blinks[i-1], OUTPUT);
-    digitalWrite(blinks[i-1], LOW);
-    blinkIntervals[i-1] = random(100) + 5000/i; // variating intervals within array of clusters
+   for(int i=1; i< blinkClusters+1; i++){
+     pinMode(blinks[i-1], OUTPUT);
+     digitalWrite(blinks[i-1], LOW);
+     blinkIntervals[i-1] = random(100) + 5000/i; // variating intervals within array of clusters
   }
 }
 
 void loop() {
+  //Calibration:
+  //while (millis() < 10000) {
+    measurementA =  sensorA.capacitiveSensor(30);
+    measurementB =  sensorB.capacitiveSensor(30);
+    // record the maximum sensor value
+    if (measurementA > measurementAHigh) {
+       measurementAHigh = measurementA;
+    }
+    // record the minimum sensor value
+    if (measurementA < measurementALow) {
+       measurementALow = measurementA;
+    }
+    if(measurementB < measurementBHigh){
+      measurementBHigh= measurementB;
+    }
+    if(measurementB > measurementBLow){
+      measurementBLow =measurementB;
+    }
+    Serial.println();
+    Serial.print("measurement B Low: ");
+    Serial.print(measurementBLow);
+    Serial.println();
+    Serial.print("measurement B High: ");
+    Serial.print(measurementBHigh);
+    Serial.println();
+    Serial.print("measurement A Low: ");
+    Serial.print(measurementALow);
+    Serial.println();
+    Serial.print("measurement A High: ");
+    Serial.print(measurementAHigh);
+  
   currentMillis = millis(); // timer to indicate blink intervals
     
   //Accessing Sensor A
-  measurementA =  sensorA.capacitiveSensor(30); //Sensor A reading
+  //measurementA =  sensorA.capacitiveSensor(30); //Sensor A reading
   map(measurementA, measurementALow, measurementAHigh, 0, 255); //Scaling for duty cycle 1
-  duty1 = measurementA; // Duty cycle 1 (brightness) varies from sensor A input
-  // Serial.println();
-  // Serial.print("Sensor A: ");
-  // Serial.print(measurementA);
+  if(measurementA >= 50){ //attempt at calibration.. revisit above map function
+duty1 = measurementA;
+  }else{
+    duty1 =0;
+  }
+   // Duty cycle 1 (brightness) varies from sensor A input
+  Serial.println();
+  Serial.print("Sensor A: ");
+  Serial.print(duty1);
 
   //Accessing Sensor B
-  measurementB =  sensorB.capacitiveSensor(30); //Sensor B reading
+  //measurementB =  sensorB.capacitiveSensor(30); //Sensor B reading
   map(measurementB, measurementBLow, measurementBHigh, 0, 255); //Scaling for duty cycle 2
-  duty2 = measurementB; // Duty cycle 2 (brightness) varies from sensor B input
-  // Serial.println();
-  // Serial.print("Sensor B: ");
-  // Serial.print(measurementB);
+  if(measurementB >= 50){
+ duty2 = measurementB; // Duty cycle 2 (brightness) varies from sensor B input
+  }else{
+    duty2 = 0;
+  }
+ 
+  Serial.println();
+  Serial.print("Sensor B: ");
+  Serial.print(duty2);
 
   //long measurementTotal = (measurementA + measurementB)/2;
 
-//Blink cluster assessment
+Blink cluster assessment
   for (int i=0; i<blinkClusters; i++){
     if(currentMillis - previousMillis[i] >= blinkIntervals[i]){
       previousMillis[i] = currentMillis;
