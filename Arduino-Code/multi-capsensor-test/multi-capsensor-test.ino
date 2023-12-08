@@ -38,22 +38,24 @@
 #include <CapacitiveSensor.h>
 #define LED1 3
 #define LED2 5
-#define LED3 6
+//#define LED3 6
 
 // capacitive sensing constant
 CapacitiveSensor sensorA = CapacitiveSensor(4,2);  // 1M resistor between pins 4 & 2, pin 2 is sensor pin
-CapacitiveSensor sensorB = CapacitiveSensor(8,7); 
-CapacitiveSensor sensorC = CapacitiveSensor(13,12); 
+CapacitiveSensor sensorB = CapacitiveSensor(9,7); 
+//CapacitiveSensor sensorC = CapacitiveSensor(13,12); 
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(57600);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
-  pinMode(LED3, OUTPUT);
+ // pinMode(LED3, OUTPUT);
   digitalWrite(LED1, LOW);
   digitalWrite(LED2, LOW);
-  digitalWrite(LED3, LOW);
-
+ // digitalWrite(LED3, LOW);
+ sensorA.reset_CS_AutoCal();
+ sensorB.reset_CS_AutoCal();
+                                                                                                                                             
 }
 
 void loop() {
@@ -67,29 +69,29 @@ void loop() {
   Serial.print("Sensor B: ");
   Serial.print(measurementB);
 
-  long measurementC =  sensorC.capacitiveSensor(30);
-  Serial.println();
-  Serial.print("Sensor C: ");
-  Serial.print(measurementC);
+  // long measurementC =  sensorC.capacitiveSensor(30);
+  // Serial.println();
+  // Serial.print("Sensor C: ");
+  // Serial.print(measurementC);
 
-  //delay();
+  //delay(500);
   
-if(measurementA > 800){
+if(measurementA > 2000){
   digitalWrite(LED1, HIGH);
 }else {
   digitalWrite(LED1, LOW);}
 
-if(measurementB > 800){
+if(measurementB > 3000){
   digitalWrite(LED2, HIGH);
 }else {
   digitalWrite(LED2, LOW);}
 
-if(measurementC > 800){
-  digitalWrite(LED3, HIGH);
-}else{
+// if(measurementC > 800){
+//   digitalWrite(LED3, HIGH);
+// }else{
   
-  digitalWrite(LED3, LOW);
-}
+//   digitalWrite(LED3, LOW);
+// }
 // if(measurement>1000){
 //   digitalWrite(LED3,HIGH);
 // }else if(measurement>500){
